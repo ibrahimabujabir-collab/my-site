@@ -425,13 +425,22 @@
       );
     });
 
-    form.addEventListener('submit', function (e) {
+    form.addEventListener('submit', async function (e) {
       e.preventDefault();
-      // Wire this up to Formspree, EmailJS, or your own backend.
-      // For now it just shows a success message.
-      success.style.display = 'block';
-      form.reset();
-      setTimeout(() => { success.style.display = 'none'; }, 5000);
+      const data = Object.fromEntries(new FormData(form));
+      try {
+        const res = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+        if (!res.ok) throw new Error('Failed to send');
+        success.style.display = 'block';
+        form.reset();
+        setTimeout(() => { success.style.display = 'none'; }, 5000);
+      } catch (err) {
+        alert('Something went wrong. Please try again.');
+      }
     });
   </script>
 </body>
